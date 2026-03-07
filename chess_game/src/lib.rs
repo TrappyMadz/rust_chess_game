@@ -3,6 +3,7 @@
 // This was done to avoid duplicating the message code between the server and the client. 
 
 use serde::{Serialize, Deserialize};
+use std::fmt;
 
 // Using .clone() instead of references for small enums to simplify ownership.
 // For small enums, the performance impact is negligible, and it makes the code significantly easier to read.
@@ -22,3 +23,39 @@ pub enum GameMessage {
     ErrorMessage(String),
 }
 
+// Error handling - manually for a greater control
+// Describe possible error types :
+#[derive(Debug)]
+pub enum ChessError {
+    Network(std::io::Error),
+    Protocol(serde_json::Error),
+    Game(String),
+}
+
+// Display implementation to show the errors
+impl fmt::Display for ChessError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ChessError::Network(error) => write!(f, "Network error : {}", error),
+            ChessError::Protocol(error) => write!(f, "JSON error : {}", error),
+            ChessError::Game(error) => write!(f, "Game logic error : {}", error),
+        }
+    }
+}
+
+// Standard error implementation, with default behavior
+impl std::error::Error for ChessError {}
+
+// If a network error happens, we want a Network chess error, not a std::io error.
+impl From<std::io::Error> for ChessError {
+    fn from(error: std::io::Error) -> Self {
+        ChessError::Network(error)
+    }
+}
+
+// Same with a serde error
+impl From<serde_json::Error> for ChessError {
+    fn from(error: serde_json::Error) -> Self {
+        ChessError::Protocol(error)
+    }
+}
