@@ -163,7 +163,7 @@ async fn main() -> Result<(), ChessError> {
                             let _ = white_write.write_all(formatted_win.as_bytes()).await;
                             let _ = black_write.write_all(formatted_win.as_bytes()).await;
                         }
-                        break; // Fin de la boucle, le serveur s'arrête
+                        break;
                     },
                     chess::BoardStatus::Stalemate => {
                         println!("[SERVER] Game over. Stalemate (Draw).");
@@ -174,7 +174,7 @@ async fn main() -> Result<(), ChessError> {
                             let _ = white_write.write_all(formatted_draw.as_bytes()).await;
                             let _ = black_write.write_all(formatted_draw.as_bytes()).await;
                         }
-                        break; // Fin de la boucle
+                        break;
                     },
                     chess::BoardStatus::Ongoing => {
 
