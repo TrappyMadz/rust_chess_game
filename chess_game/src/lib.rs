@@ -5,6 +5,10 @@
 use serde::{Serialize, Deserialize};
 use std::fmt;
 
+// Variables
+pub const SERVER_ADDRESS: &str = "127.0.0.1:8080";
+pub const DEFAULT_BOARD: &str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
 // Using .clone() instead of references for small enums to simplify ownership.
 // For small enums, the performance impact is negligible, and it makes the code significantly easier to read.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -15,10 +19,11 @@ pub enum PlayerColor {
 
 // Having multiple message variants makes the communication logic easy to follow.
 // The message can be treated differently according to their type.
+// For the moves, FEN is used. It a format widely used for chess libraries.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum GameMessage {
     Welcome(PlayerColor),
-    GameState(String),
+    GameState{ board : String, current_player: PlayerColor},
     MakeMove(String),
     ErrorMessage(String),
 }
@@ -59,3 +64,4 @@ impl From<serde_json::Error> for ChessError {
         ChessError::Protocol(error)
     }
 }
+
