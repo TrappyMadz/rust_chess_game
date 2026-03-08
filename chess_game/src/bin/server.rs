@@ -157,7 +157,7 @@ async fn main() -> Result<(), ChessError> {
                 match new_board.status() {
                     chess::BoardStatus::Checkmate => {
                         println!("[SERVER] Game over. {:?} won by checkmate.", current_turn);
-                        let win_message = GameMessage::ErrorMessage(format!("Checkmate ! {:?} win.", current_turn));
+                        let win_message = GameMessage::EndMessage(format!("Checkmate ! {:?} win. Press Esc to quit.", current_turn));
                         if let Ok(win_str) = serde_json::to_string(&win_message) {
                             let formatted_win = format!("{}\n", win_str);
                             let _ = white_write.write_all(formatted_win.as_bytes()).await;
@@ -168,7 +168,7 @@ async fn main() -> Result<(), ChessError> {
                     chess::BoardStatus::Stalemate => {
                         println!("[SERVER] Game over. Stalemate (Draw).");
                         
-                        let draw_message = GameMessage::ErrorMessage("Stalemate ! The game ends in a draw.".to_string());
+                        let draw_message = GameMessage::EndMessage("Stalemate ! The game ends in a draw. Press Esc to quit".to_string());
                         if let Ok(draw_str) = serde_json::to_string(&draw_message) {
                             let formatted_draw = format!("{}\n", draw_str);
                             let _ = white_write.write_all(formatted_draw.as_bytes()).await;

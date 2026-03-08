@@ -26,6 +26,7 @@ pub enum GameMessage {
     GameState{ board : String, current_player: PlayerColor},
     MakeMove(String),
     ErrorMessage(String),
+    EndMessage(String),
 }
 
 // Error handling - manually for a greater control

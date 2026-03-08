@@ -26,6 +26,7 @@ struct AppState {
     is_my_turn: bool,
     last_error: Option<String>,
     game_started: bool,
+    is_game_finished: bool,
 }
 
 fn main() -> Result<(), ChessError> {
@@ -59,6 +60,7 @@ fn main() -> Result<(), ChessError> {
         is_my_turn: false,
         last_error: None,
         game_started: false,
+        is_game_finished: false,
     };
 
     // to get the user input, we need to loop without blocking
@@ -143,6 +145,10 @@ fn main() -> Result<(), ChessError> {
                             GameMessage::ErrorMessage(error) => {
                                 state.last_error = Some(error);
                             }
+                            GameMessage::EndMessage(result) => {
+                                state.is_game_finished = true;
+                                state.last_error = Some(result);
+                            }
                             _ => {}
                         }
                     },
@@ -151,7 +157,10 @@ fn main() -> Result<(), ChessError> {
             }
             // Server is closed
             Ok(0) => {
-                state.last_error = Some("Connection with host lost, press Esc to exit.".to_string());
+                if !state.is_game_finished {
+                    state.last_error = Some("Connection with host lost, press Esc to exit.".to_string());
+                }
+                // If the game is finished, then we already displayed the result in the "error" field.
                 needs_redraw = true;
             },
             // Nothing to read : "fake" error
@@ -210,7 +219,7 @@ fn ui(f: &mut ratatui::Frame, state: &AppState) {
     );
 
     if let Some(error) = &state.last_error {
-        display_text.push_str(&format!("\n\nERROR : {}", error));
+        display_text.push_str(&format!("\n\n{}", error));
     }
 
     // Rendring
